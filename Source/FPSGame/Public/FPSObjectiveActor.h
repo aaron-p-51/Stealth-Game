@@ -7,6 +7,7 @@
 #include "FPSObjectiveActor.generated.h"
 
 
+
 class USphereComponent;
 
 UCLASS()
