@@ -56,11 +56,10 @@ void AFPSExtractionZone::OnOverlapCompBeginOverlap(UPrimitiveComponent* Overlapp
 
 	if (MyPawn->bIsCarryingObjective == true)
 	{
-		
 		AFPSGameMode* GM = Cast<AFPSGameMode>(GetWorld()->GetAuthGameMode());
 		if (GM != nullptr)
 		{
-			GM->CompleteMission(MyPawn);
+			GM->CompleteMission(MyPawn, true);
 		}
 	}
 	else
