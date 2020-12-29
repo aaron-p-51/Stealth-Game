@@ -6,6 +6,7 @@
 // Engine Includes
 #include "Perception/PawnSensingComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Net/UnrealNetwork.h"
 
 // Game Includes
 #include "FPSGameMode.h"
@@ -50,6 +51,12 @@ void AFPSAIGuard::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AFPSAIGuard::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AFPSAIGuard, GuardState);
+}
+
 void AFPSAIGuard::SetNextPatrolPoint()
 {
 	if (bPatrol == false || NavPoints.Num() == 0) return;
@@ -61,13 +68,22 @@ void AFPSAIGuard::SetNextPatrolPoint()
 	}
 }
 
+void AFPSAIGuard::OnRep_GuardState()
+{
+	OnStateChanged(GuardState);
+}
+
 void AFPSAIGuard::SetGuardState(EAIState NewState)
 {
 	if (GuardState == NewState) return;
 
 	GuardState = NewState;
 
-	OnStateChanged(GuardState);
+	// OnRep function not called by default on the server.
+	// for cases when playing as a listen server ie server and client
+	// then we call On_Rep function to make sure the servers client is on
+	// the same page as the other clients
+	OnRep_GuardState();
 }
 
 void AFPSAIGuard::StopCurrentMovment()

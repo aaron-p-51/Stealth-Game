@@ -10,6 +10,7 @@
 
 // Game Includes
 #include "FPSCharacter.h"
+#include "FPSGameMode.h"
 
 // Sets default values
 AFPSObjectiveActor::AFPSObjectiveActor()
@@ -29,6 +30,8 @@ AFPSObjectiveActor::AFPSObjectiveActor()
 		SphereComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 		SphereComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECR_Overlap);
 	}
+
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -54,10 +57,19 @@ void AFPSObjectiveActor::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	PlayEffects();
 
-	AFPSCharacter* MyCharacter = Cast<AFPSCharacter>(OtherActor);
-	if (MyCharacter != nullptr)
+	if (GetLocalRole() == ENetRole::ROLE_Authority)
 	{
-		MyCharacter->bIsCarryingObjective = true;
-		Destroy();
+		AFPSGameMode* GM = Cast<AFPSGameMode>(GetWorld()->GetAuthGameMode());
+		AFPSCharacter* MyCharacter = Cast<AFPSCharacter>(OtherActor);
+		if (MyCharacter != nullptr && GM != nullptr)
+		{
+			MyCharacter->bIsCarryingObjective = true;
+			APawn* MyPawn = Cast<APawn>(MyCharacter);
+			if (MyPawn != nullptr)
+			{
+				GM->OnObjectivePickedUp(MyPawn);
+			}
+			Destroy();
+		}
 	}
 }

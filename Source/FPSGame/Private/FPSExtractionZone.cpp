@@ -56,6 +56,7 @@ void AFPSExtractionZone::OnOverlapCompBeginOverlap(UPrimitiveComponent* Overlapp
 
 	if (MyPawn->bIsCarryingObjective == true)
 	{
+		// Gamemode only exists on server, GM will be null on clients
 		AFPSGameMode* GM = Cast<AFPSGameMode>(GetWorld()->GetAuthGameMode());
 		if (GM != nullptr)
 		{

@@ -37,20 +37,20 @@ protected:
 
 	FTimerHandle ResetOrientationTimerHandle;
 
+	// ReplicatedUsing function will only run on clients
+	// when the GuardStart changes
+	// the AI will only run on the server, which is setting the AIguardState
+	// for the clients to know about the update use ReplicatedUsing
+	UPROPERTY(ReplicatedUsing=OnRep_GuardState)
 	EAIState GuardState;
 
 	void SetGuardState(EAIState NewState);
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
-	void OnStateChanged(EAIState NewState);
 
 	UPROPERTY(EditInstanceOnly, Category = "Patrol")
 	bool bPatrol;
 
 	UPROPERTY(EditInstanceOnly, Category = "Patrol", meta = (EditCondition = "bPatrol"))
 	TArray<AActor*> NavPoints;
-
-	
 
 	int32 CurrentPatrolPoint;
 
@@ -72,6 +72,12 @@ protected:
 
 	UFUNCTION()
 	void ResetOrientation();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "AI")
+	void OnStateChanged(EAIState NewState);
+
+	UFUNCTION()
+	void OnRep_GuardState();
 
 public:	
 	// Sets default values for this character's properties
